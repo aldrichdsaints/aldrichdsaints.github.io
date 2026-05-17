@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Automated Weekly Reporting Pipeline – Efren Aldrich</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue-100: #B5D4F4; --blue-200: #85B7EB;
+    --blue-400: #378ADD; --blue-600: #185FA5; --blue-800: #0C447C;
+    --teal-100: #9FE1CB; --teal-400: #1D9E75; --teal-600: #0F6E56;
+    --amber-100: #FAC775; --amber-400: #EF9F27;
+    --gray-400: #888780; --gray-600: #5F5E5A;
+  }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #06192e;
+    color: #e8f1fb;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      linear-gradient(rgba(55,138,221,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(55,138,221,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none; z-index: 0;
+  }
+  .page { position: relative; z-index: 1; max-width: 820px; margin: 0 auto; padding: 0 2rem 6rem; }
+
+  /* BACK LINK */
+  .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 2.5rem 0 0;
+    font-size: 0.8rem; color: var(--blue-400);
+    text-decoration: none; font-weight: 500;
+    letter-spacing: 0.03em;
+    transition: color 0.2s;
+  }
+  .back-link:hover { color: var(--blue-200); }
+  .back-link::before { content: '←'; font-size: 1rem; }
+
+  /* HERO */
+  .hero { padding: 2rem 0 2.5rem; border-bottom: 1px solid rgba(55,138,221,0.18); margin-bottom: 3rem; }
+
+  .hero-tags { display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap; }
+  .tag {
+    font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+    padding: 3px 10px; border-radius: 4px;
+  }
+  .tag-blue { background: rgba(55,138,221,0.15); border: 1px solid rgba(55,138,221,0.3); color: var(--blue-200); }
+  .tag-teal { background: rgba(29,158,117,0.12); border: 1px solid rgba(29,158,117,0.3); color: var(--teal-100); }
+  .tag-amber { background: rgba(239,159,39,0.12); border: 1px solid rgba(239,159,39,0.28); color: var(--amber-100); }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2.4rem; line-height: 1.15; color: #fff;
+    margin-bottom: 1rem;
+  }
+  h1 em { font-style: italic; color: var(--blue-200); }
+
+  .hero-summary {
+    font-size: 1rem; line-height: 1.75; color: #93b8dc;
+    max-width: 680px; margin-bottom: 2rem;
+  }
+
+  /* IMPACT STRIP */
+  .impact-strip {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: rgba(55,138,221,0.12);
+    border: 1px solid rgba(55,138,221,0.18);
+    border-radius: 12px; overflow: hidden; margin-bottom: 3rem;
+  }
+  .impact-cell { background: rgba(6,25,46,0.85); padding: 1.25rem 1rem; text-align: center; }
+  .impact-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 2rem; color: var(--blue-200);
+    display: block; line-height: 1; margin-bottom: 4px;
+  }
+  .impact-lbl { font-size: 0.72rem; color: var(--gray-400); letter-spacing: 0.05em; }
+
+  /* SECTION LABEL */
+  .section-label {
+    font-size: 10px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--blue-400); font-weight: 600; margin-bottom: 1.25rem;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: rgba(55,138,221,0.2); }
+
+  /* FLOW */
+  .flow-section { margin-bottom: 3rem; }
+  .flow-chain {
+    display: flex; flex-direction: column; gap: 0;
+    border: 1px solid rgba(55,138,221,0.18); border-radius: 12px; overflow: hidden;
+  }
+  .flow-item {
+    display: flex; align-items: flex-start; gap: 1rem;
+    padding: 1rem 1.25rem;
+    background: rgba(12,68,124,0.1);
+    border-bottom: 1px solid rgba(55,138,221,0.1);
+    position: relative;
+    transition: background 0.2s;
+  }
+  .flow-item:last-child { border-bottom: none; }
+  .flow-item:hover { background: rgba(55,138,221,0.08); }
+  .flow-num {
+    font-family: 'DM Serif Display', serif;
+    font-size: 0.85rem; font-style: italic;
+    color: var(--blue-400); min-width: 20px; padding-top: 2px;
+  }
+  .flow-content { flex: 1; }
+  .flow-title { font-size: 0.9rem; font-weight: 600; color: #e8f1fb; margin-bottom: 2px; }
+  .flow-desc { font-size: 0.8rem; color: #7da8d0; line-height: 1.5; }
+  .flow-badge {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 3px; flex-shrink: 0; align-self: center;
+  }
+  .badge-auto { background: rgba(29,158,117,0.15); border: 1px solid rgba(29,158,117,0.3); color: var(--teal-100); }
+  .badge-manual { background: rgba(239,159,39,0.12); border: 1px solid rgba(239,159,39,0.28); color: var(--amber-100); }
+
+  /* CONTENT SECTIONS */
+  .content-section { margin-bottom: 2.5rem; }
+
+  .content-card {
+    background: rgba(12,68,124,0.1);
+    border: 1px solid rgba(55,138,221,0.15);
+    border-radius: 12px; padding: 1.5rem 1.75rem;
+    position: relative; overflow: hidden;
+  }
+  .content-card::before {
+    content: ''; position: absolute;
+    left: 0; top: 0; bottom: 0; width: 3px;
+    background: linear-gradient(180deg, var(--blue-600), var(--teal-400));
+  }
+
+  .content-card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.15rem; color: #fff; margin-bottom: 0.9rem;
+  }
+
+  .content-card p {
+    font-size: 0.875rem; color: #7da8d0; line-height: 1.75; margin-bottom: 0.75rem;
+  }
+  .content-card p:last-child { margin-bottom: 0; }
+
+  .content-card ul {
+    list-style: none; padding: 0;
+    display: flex; flex-direction: column; gap: 6px;
+  }
+  .content-card ul li {
+    font-size: 0.855rem; color: #7da8d0; line-height: 1.6;
+    display: flex; align-items: flex-start; gap: 8px;
+  }
+  .content-card ul li::before {
+    content: '→'; color: var(--blue-400); font-size: 0.8rem;
+    flex-shrink: 0; margin-top: 2px;
+  }
+
+  .highlight { color: var(--blue-200); font-weight: 600; }
+
+  /* TECH STACK */
+  .tech-section { margin-bottom: 3rem; }
+  .tech-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+  .tech-group {
+    background: rgba(12,68,124,0.1);
+    border: 1px solid rgba(55,138,221,0.15);
+    border-radius: 10px; padding: 1.1rem 1.25rem;
+  }
+  .tech-group-label {
+    font-size: 9px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--blue-400); margin-bottom: 0.75rem;
+  }
+  .tech-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tech-pill {
+    font-size: 0.75rem; font-weight: 500;
+    background: rgba(6,25,46,0.7);
+    border: 1px solid rgba(55,138,221,0.22);
+    border-radius: 4px; padding: 3px 9px; color: #93b8dc;
+  }
+
+  /* ARCHITECTURE */
+  .arch-section { margin-bottom: 3rem; }
+  .arch-flow {
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+  }
+  .arch-node {
+    width: 100%; max-width: 440px;
+    background: rgba(12,68,124,0.12);
+    border: 1px solid rgba(55,138,221,0.22);
+    border-radius: 10px; padding: 0.9rem 1.5rem;
+    text-align: center;
+  }
+  .arch-node-label { font-size: 0.875rem; font-weight: 600; color: #e8f1fb; }
+  .arch-node-sub { font-size: 0.75rem; color: var(--blue-400); margin-top: 2px; }
+  .arch-arrow {
+    font-size: 1.2rem; color: var(--blue-600); line-height: 1;
+    padding: 4px 0; display: block; text-align: center;
+  }
+
+  /* FEATURES GRID */
+  .features-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.75rem;
+  }
+  .feature-item {
+    background: rgba(12,68,124,0.1);
+    border: 1px solid rgba(55,138,221,0.15);
+    border-radius: 8px; padding: 0.9rem 1rem;
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .feature-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--teal-400); flex-shrink: 0; margin-top: 5px;
+  }
+  .feature-text { font-size: 0.825rem; color: #93b8dc; line-height: 1.5; }
+
+  /* SUMMARY */
+  .summary-card {
+    background: rgba(12,68,124,0.15);
+    border: 1px solid rgba(55,138,221,0.25);
+    border-radius: 12px; padding: 2rem;
+    text-align: center;
+  }
+  .summary-card h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem; color: #fff; margin-bottom: 0.75rem;
+  }
+  .summary-card p { font-size: 0.9rem; color: #7da8d0; line-height: 1.75; max-width: 580px; margin: 0 auto; }
+
+  /* BACK TO PORTFOLIO */
+  .back-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    margin-top: 2rem;
+    padding: 10px 22px; border-radius: 8px;
+    font-size: 0.83rem; font-weight: 600;
+    background: var(--blue-600); color: #fff;
+    text-decoration: none;
+    transition: opacity 0.2s, transform 0.15s;
+  }
+  .back-btn:hover { opacity: 0.88; transform: translateY(-1px); }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 1.75rem; }
+    .impact-strip { grid-template-columns: repeat(3, 1fr); }
+    .tech-groups { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <a class="back-link" href="index.html">Back to Portfolio</a>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-tags">
+      <span class="tag tag-blue">Automation</span>
+      <span class="tag tag-blue">ETL Pipeline</span>
+      <span class="tag tag-teal">Featured Project</span>
+      <span class="tag tag-amber">Python · Streamlit · Databricks</span>
+    </div>
+    <h1>Automated Weekly<br><em>Reporting Pipeline</em></h1>
+    <p class="hero-summary">
+      A Streamlit-based automation tool that streamlines the weekly lead recap reporting workflow used for partner reporting.
+      Connects to Databricks via OAuth, retrieves lead data, exports to Excel, and prepares the macro-enabled reporting
+      workbook — reducing a <span class="highlight">~1 hour manual process to under 3 minutes</span>.
+    </p>
+  </section>
+
+  <!-- IMPACT STRIP -->
+  <div class="impact-strip">
+    <div class="impact-cell">
+      <span class="impact-num">&lt;3 min</span>
+      <span class="impact-lbl">Down from ~1 hour</span>
+    </div>
+    <div class="impact-cell">
+      <span class="impact-num">7</span>
+      <span class="impact-lbl">Steps automated</span>
+    </div>
+    <div class="impact-cell">
+      <span class="impact-num">100%</span>
+      <span class="impact-lbl">Consistent weekly output</span>
+    </div>
+  </div>
+
+  <!-- PROCESS FLOW -->
+  <section class="flow-section">
+    <p class="section-label">Automation workflow</p>
+    <div class="flow-chain">
+      <div class="flow-item">
+        <span class="flow-num">01</span>
+        <div class="flow-content">
+          <p class="flow-title">Open Outlook Classic</p>
+          <p class="flow-desc">Prepares the email environment for partner report drafting</p>
+        </div>
+        <span class="flow-badge badge-auto">Auto</span>
+      </div>
+      <div class="flow-item">
+        <span class="flow-num">02</span>
+        <div class="flow-content">
+          <p class="flow-title">Archive Previous Source File</p>
+          <p class="flow-desc">Automatically moves last week's file to the archive folder</p>
+        </div>
+        <span class="flow-badge badge-auto">Auto</span>
+      </div>
+      <div class="flow-item">
+        <span class="flow-num">03</span>
+        <div class="flow-content">
+          <p class="flow-title">Connect to Databricks via OAuth</p>
+          <p class="flow-desc">Secure authentication to Databricks SQL Warehouse</p>
+        </div>
+        <span class="flow-badge badge-auto">Auto</span>
+      </div>
+      <div class="flow-item">
+        <span class="flow-num">04</span>
+        <div class="flow-content">
+          <p class="flow-title">Execute Reporting SQL Query</p>
+          <p class="flow-desc">Runs the lead recap query and retrieves the weekly dataset</p>
+        </div>
+        <span class="flow-badge badge-auto">Auto</span>
+      </div>
+      <div class="flow-item">
+        <span class="flow-num">05</span>
+        <div class="flow-content">
+          <p class="flow-title">Export Dataset to Excel</p>
+          <p class="flow-desc">Saves results with a dynamically generated weekly filename</p>
+        </div>
+        <span class="flow-badge badge-auto">Auto</span>
+      </div>
+      <div class="flow-item">
+        <span class="flow-num">06</span>
+        <div class="flow-content">
+          <p class="flow-title">Open Macro-enabled Excel Report</p>
+          <p class="flow-desc">Launches the Weekly Lead Recap workbook with dataset preview</p>
+        </div>
+        <span class="flow-badge badge-auto">Auto</span>
+      </div>
+      <div class="flow-item">
+        <span class="flow-num">07</span>
+        <div class="flow-content">
+          <p class="flow-title">Generate Partner Files & Send Emails</p>
+          <p class="flow-desc">Partner-specific Save As and Send Email buttons via existing VBA macros</p>
+        </div>
+        <span class="flow-badge badge-manual">Manual</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- BUSINESS PROBLEM -->
+  <section class="content-section">
+    <p class="section-label">Business problem</p>
+    <div class="content-card">
+      <p>Before this automation, the weekly lead recap reporting process relied heavily on manual steps across multiple tools — extracting data from LeadPortal, preparing Excel reports, and manually drafting partner emails.</p>
+      <p>The initial preparation stage alone typically took <span class="highlight">around one hour</span> each week, involving repetitive tasks across different systems that were time-consuming and prone to human error — incorrect file naming, misplaced files, outdated data, or inconsistent report preparation.</p>
+      <ul>
+        <li>Filtering partner data and date ranges in LeadPortal manually</li>
+        <li>Manually updating Excel reporting files and recreating pivot tables</li>
+        <li>Manually saving, renaming, and navigating files across folders</li>
+        <li>Manually drafting individual partner emails in Outlook</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- SOLUTION -->
+  <section class="content-section">
+    <p class="section-label">Solution</p>
+    <div class="content-card">
+      <p>I developed a <span class="highlight">Streamlit-based workflow automation tool</span> that guides the user through the reporting process and automates all repetitive preparation tasks — ensuring the workflow runs in a structured and repeatable way every week.</p>
+      <p>The application serves as a single-entry point for the entire weekly pipeline, from OAuth authentication through to the Excel report being open and ready for partner distribution.</p>
+    </div>
+  </section>
+
+  <!-- MY CONTRIBUTION -->
+  <section class="content-section">
+    <p class="section-label">My contribution</p>
+    <div class="content-card">
+      <p>I designed and implemented the full automation layer using Python, Streamlit, Power Query, and VBA — integrating a modern data extraction workflow with the existing Excel-based reporting process without disrupting the team's structure.</p>
+      <ul>
+        <li>Designed the Streamlit interface to guide users through each step</li>
+        <li>Implemented Databricks SQL connection using OAuth authentication</li>
+        <li>Automated file archiving and export workflows with dynamic file naming</li>
+        <li>Integrated the workflow with the existing Excel VBA reporting template</li>
+        <li>Added progress indicators, status messages, and dataset previews</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- KEY FEATURES -->
+  <section class="content-section">
+    <p class="section-label">Key features</p>
+    <div class="features-grid">
+      <div class="feature-item"><span class="feature-dot"></span><span class="feature-text">Guided step-by-step reporting workflow</span></div>
+      <div class="feature-item"><span class="feature-dot"></span><span class="feature-text">Secure Databricks OAuth connection</span></div>
+      <div class="feature-item"><span class="feature-dot"></span><span class="feature-text">Automated source file archiving</span></div>
+      <div class="feature-item"><span class="feature-dot"></span><span class="feature-text">Dynamic weekly export file naming</span></div>
+      <div class="feature-item"><span class="feature-dot"></span><span class="feature-text">Dataset preview inside the app</span></div>
+      <div class="feature-item"><span class="feature-dot"></span><span class="feature-text">Seamless Excel VBA integration</span></div>
+      <div class="feature-item"><span class="feature-dot"></span><span class="feature-text">Reduced manual preparation steps</span></div>
+    </div>
+  </section>
+
+  <!-- TECH STACK -->
+  <section class="tech-section">
+    <p class="section-label">Technology stack</p>
+    <div class="tech-groups">
+      <div class="tech-group">
+        <p class="tech-group-label">Programming & Automation</p>
+        <div class="tech-pills">
+          <span class="tech-pill">Python</span>
+          <span class="tech-pill">Streamlit</span>
+          <span class="tech-pill">Pandas</span>
+        </div>
+      </div>
+      <div class="tech-group">
+        <p class="tech-group-label">Data Platform</p>
+        <div class="tech-pills">
+          <span class="tech-pill">Databricks SQL</span>
+          <span class="tech-pill">OAuth 2.0</span>
+          <span class="tech-pill">SQL</span>
+        </div>
+      </div>
+      <div class="tech-group">
+        <p class="tech-group-label">Reporting Tools</p>
+        <div class="tech-pills">
+          <span class="tech-pill">Excel</span>
+          <span class="tech-pill">Power Query</span>
+          <span class="tech-pill">VBA Macros</span>
+          <span class="tech-pill">Outlook</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ARCHITECTURE -->
+  <section class="arch-section">
+    <p class="section-label">Automation architecture</p>
+    <div class="arch-flow">
+      <div class="arch-node">
+        <p class="arch-node-label">Databricks SQL Warehouse</p>
+        <p class="arch-node-sub">OAuth-authenticated data source</p>
+      </div>
+      <span class="arch-arrow">↓</span>
+      <div class="arch-node">
+        <p class="arch-node-label">Python / Streamlit Application</p>
+        <p class="arch-node-sub">Automation orchestration layer</p>
+      </div>
+      <span class="arch-arrow">↓</span>
+      <div class="arch-node">
+        <p class="arch-node-label">Excel Source Folder</p>
+        <p class="arch-node-sub">Automated weekly export with dynamic naming</p>
+      </div>
+      <span class="arch-arrow">↓</span>
+      <div class="arch-node">
+        <p class="arch-node-label">Macro-enabled Excel Workbook</p>
+        <p class="arch-node-sub">Pivot tables & partner report generation</p>
+      </div>
+      <span class="arch-arrow">↓</span>
+      <div class="arch-node">
+        <p class="arch-node-label">Partner Files & Outlook Emails</p>
+        <p class="arch-node-sub">Final distribution via VBA-triggered drafts</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- SUMMARY -->
+  <div class="summary-card">
+    <h2>From 1 hour to under 3 minutes</h2>
+    <p>
+      By combining Databricks, Streamlit, and Excel automation, this project transformed a fragmented manual reporting process
+      into a structured, reliable pipeline. It demonstrates how Python and modern data tools can integrate seamlessly
+      with existing workflows to drive meaningful efficiency gains.
+    </p>
+    <a class="back-btn" href="index.html">← Back to Portfolio</a>
+  </div>
+
+</div>
+</body>
+</html>
