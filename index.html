@@ -290,7 +290,7 @@
       <span class="metric-lbl">Years in SQL & BI</span>
     </div>
     <div class="metric-cell">
-      <span class="metric-num">2</span>
+      <span class="metric-num">3</span>
       <span class="metric-lbl">Featured projects</span>
     </div>
     <div class="metric-cell">
@@ -375,9 +375,31 @@
         </div>
       </div>
 
-      <div class="project-card" style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:200px; border-style:dashed; opacity:0.55; text-align:center; gap:10px;">
-        <span style="font-size:1.8rem; color:var(--blue-600);">+</span>
-        <p style="font-size:0.82rem; color:var(--gray-400);">More projects coming soon</p>
+      <div class="project-card" onclick="window.location.href='project-editorial-insights.html'" style="cursor:pointer;">
+        <div class="card-meta">
+          <span class="card-type">Business Intelligence</span>
+          <span class="card-badge">Power BI</span>
+        </div>
+        <h2>Editorial Insights</h2>
+        <p class="project-desc">
+          A Power BI report for the Editorial Team tracking website performance, content engagement,
+          audience growth, newsletter analytics, and low-performing articles — powered by GA4 and Omeda via Databricks SQL.
+        </p>
+        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-bottom:1rem;">
+          <span style="font-size:0.72rem; background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.2); border-radius:4px; padding:2px 7px; color:#67e8f9; font-weight:500;">8 Pages</span>
+          <span style="font-size:0.72rem; background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.2); border-radius:4px; padding:2px 7px; color:#67e8f9; font-weight:500;">16.6M Users</span>
+          <span style="font-size:0.72rem; background:rgba(6,182,212,0.08); border:1px solid rgba(6,182,212,0.2); border-radius:4px; padding:2px 7px; color:#67e8f9; font-weight:500;">GA4 + Omeda</span>
+        </div>
+        <div class="tech-stack">
+          <span class="tech-pill">Power BI</span>
+          <span class="tech-pill">DAX</span>
+          <span class="tech-pill">GA4</span>
+          <span class="tech-pill">Databricks SQL</span>
+          <span class="tech-pill">Omeda</span>
+        </div>
+        <div style="margin-top:1.1rem; padding-top:1rem; border-top:1px solid rgba(6,182,212,0.12); display:flex; justify-content:flex-end;">
+          <a href="project-editorial-insights.html" onclick="event.stopPropagation()" style="font-size:0.8rem; font-weight:600; color:#67e8f9; text-decoration:none;">View full project →</a>
+        </div>
       </div>
 
     </div>
