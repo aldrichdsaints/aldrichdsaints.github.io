@@ -523,41 +523,41 @@
         <span style="font-size:0.75rem; font-weight:600; color:#67e8f9; font-family:monospace;">weekly_lead_recap_report.py</span>
         <span style="font-size:0.68rem; color:#737373; text-transform:uppercase; letter-spacing:0.1em;">Python · Streamlit</span>
       </div>
-      <pre style="margin:0; padding:1.25rem 1rem; overflow-x:auto; font-size:0.76rem; line-height:1.7; font-family:'Courier New',monospace; color:#d4d4d4; white-space:pre;"><span style="color:#67e8f9;">import</span> os
-<span style="color:#67e8f9;">import</span> shutil
-<span style="color:#67e8f9;">import</span> subprocess
-<span style="color:#67e8f9;">from</span> datetime <span style="color:#67e8f9;">import</span> datetime, timedelta
-<span style="color:#67e8f9;">from</span> pathlib <span style="color:#67e8f9;">import</span> Path
+      <pre style="margin:0; padding:1.25rem 1rem; overflow-x:auto; font-size:0.76rem; line-height:1.7; font-family:'Courier New',monospace; color:#d4d4d4; white-space:pre; tab-size:4;">import os
+import shutil
+import subprocess
+from datetime import datetime, timedelta
+from pathlib import Path
 
-<span style="color:#67e8f9;">import</span> pandas <span style="color:#67e8f9;">as</span> pd
-<span style="color:#67e8f9;">import</span> streamlit <span style="color:#67e8f9;">as</span> st
-<span style="color:#67e8f9;">from</span> databricks <span style="color:#67e8f9;">import</span> sql
-<span style="color:#67e8f9;">from</span> configparser <span style="color:#67e8f9;">import</span> ConfigParser
+import pandas as pd
+import streamlit as st
+from databricks import sql
+from configparser import ConfigParser
 
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#525252; font-style:italic;"># PAGE CONFIG  (must be first Streamlit call)</span>
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
+# ============================================================
+# PAGE CONFIG  (must be first Streamlit call)
+# ============================================================
 st.set_page_config(
-    page_title=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Weekly Lead Recap&quot;</span>,</span>
-    page_icon=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;📋&quot;</span>,</span>
-    layout=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;wide&quot;</span>,</span>
+    page_title=&quot;Weekly Lead Recap&quot;,
+    page_icon=&quot;📋&quot;,
+    layout=&quot;wide&quot;,
 )
 
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#525252; font-style:italic;"># STYLING</span>
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-st.markdown(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;</span>
+# ============================================================
+# STYLING
+# ============================================================
+st.markdown(&quot;&quot;&quot;
 &lt;style&gt;
-@<span style="color:#67e8f9;">import</span> url(&<span style="color:#525252; font-style:italic;">#x27;https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&amp;display=swap&#x27;);</span>
+@import url(&#x27;https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&amp;display=swap&#x27;);
 
-html, body, [<span style="color:#67e8f9;">class</span>*=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;css&quot;</span>] {</span>
-    font-family: <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&#x27;IBM Plex Sans&#x27;</span>, sans-serif;</span>
+html, body, [class*=&quot;css&quot;] {
+    font-family: &#x27;IBM Plex Sans&#x27;, sans-serif;
 }
 
 /* ── Theme-aware tokens ── */
 :root {
-    --accent:       <span style="color:#525252; font-style:italic;">#e63946;</span>
-    --accent-hover: <span style="color:#525252; font-style:italic;">#c1121f;</span>
+    --accent:       #e63946;
+    --accent-hover: #c1121f;
     --accent-dim:   rgba(230, 57, 70, 0.12);
     --accent-border:rgba(230, 57, 70, 0.30);
     --card-bg:      rgba(255, 255, 255, 0.05);
@@ -617,7 +617,7 @@ html, body, [<span style="color:#67e8f9;">class</span>*=<span style="color:<span
     font-size: 1.0rem;
     font-weight: 600;
     margin-bottom: 0.25rem;
-    /* inherit Streamlit<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&#x27;s theme text color — works <span style="color:#67e8f9;">in</span> both light <span style="color:#67e8f9;">and</span> dark */</span>
+    /* inherit Streamlit&#x27;s theme text color — works in both light and dark */
 }
 .step-card .step-desc {
     font-size: 0.83rem;
@@ -636,7 +636,7 @@ html, body, [<span style="color:#67e8f9;">class</span>*=<span style="color:<span
     border-radius: 5px;
     padding: 4px 10px;
     margin-top: 0.4rem;
-    font-family: &<span style="color:#525252; font-style:italic;">#x27;</span>IBM Plex Mono&#x27;, monospace;</span>
+    font-family: &#x27;IBM Plex Mono&#x27;, monospace;
     letter-spacing: 0.01em;
 }
 
@@ -661,7 +661,7 @@ html, body, [<span style="color:#67e8f9;">class</span>*=<span style="color:<span
 .flow-list li::before {
     content: counter(flow-counter);
     background: var(--accent);
-    color: <span style="color:#525252; font-style:italic;">#fff;</span>
+    color: #fff;
     font-size: 0.68rem;
     font-weight: 700;
     min-width: 20px;
@@ -682,87 +682,87 @@ html, body, [<span style="color:#67e8f9;">class</span>*=<span style="color:<span
 }
 
 /* ── Primary button override ── */
-.stButton &gt; button[kind=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;primary&quot;</span>] {</span>
+.stButton &gt; button[kind=&quot;primary&quot;] {
     background-color: var(--accent) !important;
-    color: <span style="color:#525252; font-style:italic;">#fff !important;</span>
+    color: #fff !important;
     border: none !important;
     border-radius: 6px !important;
-    font-family: <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&#x27;IBM Plex Sans&#x27;</span>, sans-serif !important;</span>
+    font-family: &#x27;IBM Plex Sans&#x27;, sans-serif !important;
     font-weight: 600 !important;
     font-size: 0.85rem !important;
     padding: 0.45rem 1.1rem !important;
     transition: background-color 0.15s ease !important;
 }
-.stButton &gt; button[kind=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;primary&quot;</span>]:hover {</span>
+.stButton &gt; button[kind=&quot;primary&quot;]:hover {
     background-color: var(--accent-hover) !important;
 }
-.stButton &gt; button[kind=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;primary&quot;</span>]:disabled {</span>
+.stButton &gt; button[kind=&quot;primary&quot;]:disabled {
     opacity: 0.45 !important;
-    cursor: <span style="color:#67e8f9;">not</span>-allowed !important;
+    cursor: not-allowed !important;
 }
 
 /* ── Expander ── */
-[data-testid=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;stExpander&quot;</span>] {</span>
+[data-testid=&quot;stExpander&quot;] {
     border: 1px solid var(--card-border) !important;
     border-radius: 8px !important;
 }
 
 /* ── Alert tweaks ── */
-[data-testid=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;stAlertContainer&quot;</span>] {</span>
+[data-testid=&quot;stAlertContainer&quot;] {
     border-radius: 8px !important;
     font-size: 0.85rem !important;
 }
 
 /* ── DataFrame ── */
-[data-testid=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;stDataFrame&quot;</span>] { border-radius: 8px; overflow: hidden; }</span>
+[data-testid=&quot;stDataFrame&quot;] { border-radius: 8px; overflow: hidden; }
 
 /* ── Misc ── */
 .block-container { padding-top: 1.5rem; padding-bottom: 1.5rem; }
 &lt;/style&gt;
-<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+&quot;&quot;&quot;, unsafe_allow_html=True)
 
 
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#525252; font-style:italic;"># LOAD CONFIG FILE</span>
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-config_path = r<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;[PATH REDACTED]&quot;</span></span>
+# ============================================================
+# LOAD CONFIG FILE
+# ============================================================
+config_path = r&quot;[PATH REDACTED]&quot;
 
 config = ConfigParser()
 config.read(config_path)
 
-<span style="color:#67e8f9;">if</span> <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;databricks&quot;</span> <span style="color:#67e8f9;">not</span> <span style="color:#67e8f9;">in</span> config:</span>
-    <span style="color:#67e8f9;">raise</span> Exception(f<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;[databricks] section <span style="color:#67e8f9;">not</span> found <span style="color:#67e8f9;">in</span> {config_path}&quot;</span>)</span>
+if &quot;databricks&quot; not in config:
+    raise Exception(f&quot;[databricks] section not found in {config_path}&quot;)
 
-SERVER_HOSTNAME = config.get(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;databricks&quot;</span>, <span style="color:#86efac;">&quot;server_hostname&quot;</span>)</span>
-HTTP_PATH       = config.get(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;databricks&quot;</span>, <span style="color:#86efac;">&quot;http_path&quot;</span>)</span>
-AUTH_TYPE       = config.get(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;databricks&quot;</span>, <span style="color:#86efac;">&quot;auth_type&quot;</span>)</span>
+SERVER_HOSTNAME = config.get(&quot;databricks&quot;, &quot;server_hostname&quot;)
+HTTP_PATH       = config.get(&quot;databricks&quot;, &quot;http_path&quot;)
+AUTH_TYPE       = config.get(&quot;databricks&quot;, &quot;auth_type&quot;)
 
 
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#525252; font-style:italic;"># DEFAULTS</span>
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
+# ============================================================
+# DEFAULTS
+# ============================================================
 DEFAULT_SERVER_HOSTNAME = SERVER_HOSTNAME
 DEFAULT_HTTP_PATH       = HTTP_PATH
 
 DEFAULT_SOURCE_DIR = (
-    r<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;[PATH REDACTED]&quot;</span></span>
+    r&quot;[PATH REDACTED]&quot;
 )
 DEFAULT_ARCHIVE_DIR = (
-    r<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;[PATH REDACTED]&quot;</span></span>
+    r&quot;[PATH REDACTED]&quot;
 )
 DEFAULT_REPORT_FILE_PATH = (
-    r<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;[PATH REDACTED]&quot;</span></span>
+    r&quot;[PATH REDACTED]&quot;
 )
-DEFAULT_SHEET_NAME = <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Leads&quot;</span></span>
+DEFAULT_SHEET_NAME = &quot;Leads&quot;
 
 
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#525252; font-style:italic;"># SQL QUERY</span>
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-SQL_QUERY = <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;</span>
+# ============================================================
+# SQL QUERY
+# ============================================================
+SQL_QUERY = &quot;&quot;&quot;
 SELECT DISTINCT
     TRIM(partner_company)                                       AS partner
-    , TO_TIMESTAMP(date_created, <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&#x27;yyyy-MM-dd HH:mm&#x27;</span>)            AS transaction_date</span>
+    , TO_TIMESTAMP(date_created, &#x27;yyyy-MM-dd HH:mm&#x27;)            AS transaction_date
     , price
     , lead_id
     , company
@@ -780,246 +780,247 @@ FROM
     boberdoo.bronze.gpst_30
 WHERE
     partner_company IN (
-        <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&#x27;[PARTNER]&#x27;</span>, <span style="color:#86efac;">&#x27;[PARTNER]&#x27;</span>, <span style="color:#86efac;">&#x27;[PARTNER]&#x27;</span>, <span style="color:#86efac;">&#x27;[PARTNER]&#x27;</span>, <span style="color:#86efac;">&#x27;[PARTNER]&#x27;</span>, <span style="color:#86efac;">&#x27;[PARTNER]&#x27;</span></span>
+        &#x27;[PARTNER 1]&#x27;, &#x27;[PARTNER 2]&#x27;, &#x27;[PARTNER 3]&#x27;,
+        &#x27;[PARTNER 4]&#x27;, &#x27;[PARTNER 5]&#x27;, &#x27;[PARTNER 6]&#x27;
     )
     AND TO_DATE(date_created) BETWEEN
-        DATE_SUB(NEXT_DAY(CURRENT_DATE(), <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&#x27;Mon&#x27;</span>), 14)</span>
-        AND DATE_SUB(NEXT_DAY(CURRENT_DATE(), <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&#x27;Mon&#x27;</span>), 8)</span>
+        DATE_SUB(NEXT_DAY(CURRENT_DATE(), &#x27;Mon&#x27;), 14)
+        AND DATE_SUB(NEXT_DAY(CURRENT_DATE(), &#x27;Mon&#x27;), 8)
     AND features IS NOT NULL
 ORDER BY
     transaction_date DESC
-<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;</span>
+&quot;&quot;&quot;
 
 
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#525252; font-style:italic;"># HELPERS</span>
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#67e8f9;">def</span> <span style="color:#a5f3fc;">safe_mkdir</span>(path: str) -&gt; <span style="color:#67e8f9;">None</span>:
-    os.makedirs(path, exist_ok=<span style="color:#67e8f9;">True</span>)
+# ============================================================
+# HELPERS
+# ============================================================
+def safe_mkdir(path: str) -&gt; None:
+    os.makedirs(path, exist_ok=True)
 
 
-<span style="color:#67e8f9;">def</span> <span style="color:#a5f3fc;">get_previous_week_range</span>():
+def get_previous_week_range():
     today = datetime.today()
     this_monday  = today - timedelta(days=today.weekday())
     prev_monday  = this_monday - timedelta(days=7)
     prev_sunday  = this_monday - timedelta(days=1)
-    <span style="color:#67e8f9;">return</span> prev_monday, prev_sunday
+    return prev_monday, prev_sunday
 
 
-<span style="color:#67e8f9;">def</span> <span style="color:#a5f3fc;">format_month_day_no_zero</span>(dt: datetime, with_year: bool = <span style="color:#67e8f9;">False</span>) -&gt; str:
-    s = dt.strftime(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;%b %d %Y&quot;</span>) <span style="color:#67e8f9;">if</span> with_year <span style="color:#67e8f9;">else</span> dt.strftime(<span style="color:#86efac;">&quot;%b %d&quot;</span>)</span>
-    <span style="color:#67e8f9;">return</span> s.replace(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot; 0&quot;</span>, <span style="color:#86efac;">&quot; &quot;</span>)</span>
+def format_month_day_no_zero(dt: datetime, with_year: bool = False) -&gt; str:
+    s = dt.strftime(&quot;%b %d %Y&quot;) if with_year else dt.strftime(&quot;%b %d&quot;)
+    return s.replace(&quot; 0&quot;, &quot; &quot;)
 
 
-<span style="color:#67e8f9;">def</span> <span style="color:#a5f3fc;">build_output_file_name</span>() -&gt; str:
+def build_output_file_name() -&gt; str:
     prev_monday, prev_sunday = get_previous_week_range()
-    start_str = format_month_day_no_zero(prev_monday, with_year=<span style="color:#67e8f9;">False</span>)
-    end_str   = format_month_day_no_zero(prev_sunday, with_year=<span style="color:#67e8f9;">True</span>)
-    <span style="color:#67e8f9;">return</span> f<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Weekly Lead Recap <span style="color:#67e8f9;">for</span> Week of {start_str} - {end_str}.xlsx&quot;</span></span>
+    start_str = format_month_day_no_zero(prev_monday, with_year=False)
+    end_str   = format_month_day_no_zero(prev_sunday, with_year=True)
+    return f&quot;Weekly Lead Recap for Week of {start_str} - {end_str}.xlsx&quot;
 
 
-<span style="color:#67e8f9;">def</span> <span style="color:#a5f3fc;">run_databricks_query_oauth</span>(server_hostname: str, http_path: str, query: str) -&gt; pd.DataFrame:
-    <span style="color:#67e8f9;">with</span> sql.connect(
+def run_databricks_query_oauth(server_hostname: str, http_path: str, query: str) -&gt; pd.DataFrame:
+    with sql.connect(
         server_hostname=server_hostname,
         http_path=http_path,
-        auth_type=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;oauth&quot;</span>,</span>
-    ) <span style="color:#67e8f9;">as</span> connection:
-        <span style="color:#67e8f9;">with</span> connection.cursor() <span style="color:#67e8f9;">as</span> cursor:
+        auth_type=&quot;oauth&quot;,
+    ) as connection:
+        with connection.cursor() as cursor:
             cursor.execute(query)
             rows = cursor.fetchall()
-            cols = [d[0] <span style="color:#67e8f9;">for</span> d <span style="color:#67e8f9;">in</span> cursor.description]
-    <span style="color:#67e8f9;">return</span> pd.DataFrame(rows, columns=cols)
+            cols = [d[0] for d in cursor.description]
+    return pd.DataFrame(rows, columns=cols)
 
 
-<span style="color:#67e8f9;">def</span> <span style="color:#a5f3fc;">archive_existing_source_files</span>(source_dir: str, archive_dir: str) -&gt; list[dict]:
+def archive_existing_source_files(source_dir: str, archive_dir: str) -&gt; list[dict]:
     source_path  = Path(source_dir)
     archive_path = Path(archive_dir)
 
-    <span style="color:#67e8f9;">if</span> <span style="color:#67e8f9;">not</span> source_path.exists():
-        <span style="color:#67e8f9;">raise</span> FileNotFoundError(f<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Source folder does <span style="color:#67e8f9;">not</span> exist: {source_dir}&quot;</span>)</span>
+    if not source_path.exists():
+        raise FileNotFoundError(f&quot;Source folder does not exist: {source_dir}&quot;)
 
-    archive_path.mkdir(parents=<span style="color:#67e8f9;">True</span>, exist_ok=<span style="color:#67e8f9;">True</span>)
+    archive_path.mkdir(parents=True, exist_ok=True)
     moved_files = []
 
-    <span style="color:#67e8f9;">for</span> item <span style="color:#67e8f9;">in</span> source_path.iterdir():
-        <span style="color:#67e8f9;">if</span> <span style="color:#67e8f9;">not</span> item.is_file():
-            <span style="color:#67e8f9;">continue</span>
+    for item in source_path.iterdir():
+        if not item.is_file():
+            continue
         target_path = archive_path / item.name
         shutil.move(str(item), str(target_path))
-        moved_files.append({<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;file_name&quot;</span>: item.name, <span style="color:#86efac;">&quot;<span style="color:#67e8f9;">from</span>&quot;</span>: str(item), <span style="color:#86efac;">&quot;to&quot;</span>: str(target_path)})</span>
+        moved_files.append({&quot;file_name&quot;: item.name, &quot;from&quot;: str(item), &quot;to&quot;: str(target_path)})
 
-    <span style="color:#67e8f9;">return</span> moved_files
+    return moved_files
 
 
-<span style="color:#67e8f9;">def</span> <span style="color:#a5f3fc;">export_to_excel</span>(df: pd.DataFrame, output_dir: str, sheet_name: str) -&gt; str:
+def export_to_excel(df: pd.DataFrame, output_dir: str, sheet_name: str) -&gt; str:
     safe_mkdir(output_dir)
 
-    <span style="color:#67e8f9;">for</span> col <span style="color:#67e8f9;">in</span> df.columns:
-        <span style="color:#67e8f9;">if</span> pd.api.types.is_datetime64tz_dtype(df[col]):
-            df[col] = df[col].dt.tz_convert(<span style="color:#67e8f9;">None</span>)
+    for col in df.columns:
+        if pd.api.types.is_datetime64tz_dtype(df[col]):
+            df[col] = df[col].dt.tz_convert(None)
 
     file_name = build_output_file_name()
     out_path  = os.path.join(output_dir, file_name)
 
-    <span style="color:#67e8f9;">with</span> pd.ExcelWriter(out_path, engine=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;openpyxl&quot;</span>) <span style="color:#67e8f9;">as</span> writer:</span>
-        df.to_excel(writer, index=<span style="color:#67e8f9;">False</span>, sheet_name=sheet_name)
+    with pd.ExcelWriter(out_path, engine=&quot;openpyxl&quot;) as writer:
+        df.to_excel(writer, index=False, sheet_name=sheet_name)
 
-    <span style="color:#67e8f9;">return</span> out_path
+    return out_path
 
 
-<span style="color:#67e8f9;">def</span> <span style="color:#a5f3fc;">open_file_in_default_app</span>(file_path: str) -&gt; <span style="color:#67e8f9;">None</span>:
-    <span style="color:#67e8f9;">if</span> <span style="color:#67e8f9;">not</span> os.path.exists(file_path):
-        <span style="color:#67e8f9;">raise</span> FileNotFoundError(f<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;File does <span style="color:#67e8f9;">not</span> exist: {file_path}&quot;</span>)</span>
+def open_file_in_default_app(file_path: str) -&gt; None:
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f&quot;File does not exist: {file_path}&quot;)
     os.startfile(file_path)
 
 
-<span style="color:#67e8f9;">def</span> <span style="color:#a5f3fc;">open_outlook_classic</span>() -&gt; <span style="color:#67e8f9;">None</span>:
+def open_outlook_classic() -&gt; None:
     possible_paths = [
-        r<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;C:\Program Files\Microsoft Office\root\Office16\OUTLOOK.EXE&quot;</span>,</span>
-        r<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;C:\Program Files (x86)\Microsoft Office\root\Office16\OUTLOOK.EXE&quot;</span>,</span>
-        r<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;C:\Program Files\Microsoft Office\Office16\OUTLOOK.EXE&quot;</span>,</span>
-        r<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;C:\Program Files (x86)\Microsoft Office\Office16\OUTLOOK.EXE&quot;</span>,</span>
+        r&quot;[PATH REDACTED]&quot;,
+        r&quot;[PATH REDACTED]&quot;,
+        r&quot;[PATH REDACTED]&quot;,
+        r&quot;[PATH REDACTED]&quot;,
     ]
-    <span style="color:#67e8f9;">for</span> outlook_path <span style="color:#67e8f9;">in</span> possible_paths:
-        <span style="color:#67e8f9;">if</span> os.path.exists(outlook_path):
+    for outlook_path in possible_paths:
+        if os.path.exists(outlook_path):
             os.startfile(outlook_path)
-            <span style="color:#67e8f9;">return</span>
-    <span style="color:#67e8f9;">try</span>:
-        subprocess.Popen([<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;cmd&quot;</span>, <span style="color:#86efac;">&quot;/c&quot;</span>, <span style="color:#86efac;">&quot;start&quot;</span>, <span style="color:#86efac;">&quot;&quot;</span>, <span style="color:#86efac;">&quot;outlook&quot;</span>], shell=<span style="color:#67e8f9;">False</span>)</span>
-    <span style="color:#67e8f9;">except</span> Exception <span style="color:#67e8f9;">as</span> e:
-        <span style="color:#67e8f9;">raise</span> RuntimeError(
-            <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Unable to open Outlook Classic automatically. &quot;</span></span>
-            <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Please confirm Outlook Classic <span style="color:#67e8f9;">is</span> installed on this device.&quot;</span></span>
-        ) <span style="color:#67e8f9;">from</span> e
+            return
+    try:
+        subprocess.Popen([&quot;cmd&quot;, &quot;/c&quot;, &quot;start&quot;, &quot;&quot;, &quot;outlook&quot;], shell=False)
+    except Exception as e:
+        raise RuntimeError(
+            &quot;Unable to open Outlook Classic automatically. &quot;
+            &quot;Please confirm Outlook Classic is installed on this device.&quot;
+        ) from e
 
 
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#525252; font-style:italic;"># SESSION STATE</span>
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#67e8f9;">if</span> <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;archive_done&quot;</span>   <span style="color:#67e8f9;">not</span> <span style="color:#67e8f9;">in</span> st.session_state: st.session_state.archive_done   = <span style="color:#67e8f9;">False</span></span>
-<span style="color:#67e8f9;">if</span> <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;archive_result&quot;</span> <span style="color:#67e8f9;">not</span> <span style="color:#67e8f9;">in</span> st.session_state: st.session_state.archive_result = <span style="color:#67e8f9;">None</span></span>
-<span style="color:#67e8f9;">if</span> <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;export_result&quot;</span>  <span style="color:#67e8f9;">not</span> <span style="color:#67e8f9;">in</span> st.session_state: st.session_state.export_result  = <span style="color:#67e8f9;">None</span></span>
+# ============================================================
+# SESSION STATE
+# ============================================================
+if &quot;archive_done&quot;   not in st.session_state: st.session_state.archive_done   = False
+if &quot;archive_result&quot; not in st.session_state: st.session_state.archive_result = None
+if &quot;export_result&quot;  not in st.session_state: st.session_state.export_result  = None
 
 
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#525252; font-style:italic;"># HEADER</span>
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
+# ============================================================
+# HEADER
+# ============================================================
 _prev_monday, _prev_sunday = get_previous_week_range()
 _week_label = (
-    f<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;{format_month_day_no_zero(_prev_monday)} – &quot;</span></span>
-    f<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;{format_month_day_no_zero(_prev_sunday, with_year=<span style="color:#67e8f9;">True</span>)}&quot;</span></span>
+    f&quot;{format_month_day_no_zero(_prev_monday)} – &quot;
+    f&quot;{format_month_day_no_zero(_prev_sunday, with_year=True)}&quot;
 )
 
 st.markdown(
-    <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&lt;style&gt;.title-rule{border-bottom:3px solid #e63946;padding-bottom:0.4rem;margin-bottom:0.2rem;}&lt;/style&gt;&quot;</span></span>
-    &<span style="color:#525252; font-style:italic;">#x27;&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&quot;title-rule&quot;</span>&gt;&lt;h1 style=<span style="color:#86efac;">&quot;margin:0;font-family:\<span style="color:#86efac;">&#x27;IBM Plex Sans\&#x27;</span>,sans-serif;font-weight:700;letter-spacing:-0.5px;&quot;</span>&gt;Weekly Lead Recap Export&lt;/h1&gt;&lt;/div&gt;&#x27;,</span>
-    unsafe_allow_html=<span style="color:#67e8f9;">True</span>,
+    &quot;&lt;style&gt;.title-rule{border-bottom:3px solid #e63946;padding-bottom:0.4rem;margin-bottom:0.2rem;}&lt;/style&gt;&quot;
+    &#x27;&lt;div class=&quot;title-rule&quot;&gt;&lt;h1 style=&quot;margin:0;font-family:\&#x27;IBM Plex Sans\&#x27;,sans-serif;font-weight:700;letter-spacing:-0.5px;&quot;&gt;Weekly Lead Recap Export&lt;/h1&gt;&lt;/div&gt;&#x27;,
+    unsafe_allow_html=True,
 )
-st.caption(f<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Databricks OAuth → Excel · Report week: **{_week_label}**&quot;</span>)</span>
+st.caption(f&quot;Databricks OAuth → Excel · Report week: **{_week_label}**&quot;)
 
-<span style="color:#525252; font-style:italic;"># Output file name badge</span>
+# Output file name badge
 _file_name = build_output_file_name()
 st.markdown(
-    f&<span style="color:#525252; font-style:italic;">#x27;&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&quot;filename-badge&quot;</span>&gt;📄 {_file_name}&lt;/div&gt;&#x27;,</span>
-    unsafe_allow_html=<span style="color:#67e8f9;">True</span>,
+    f&#x27;&lt;div class=&quot;filename-badge&quot;&gt;📄 {_file_name}&lt;/div&gt;&#x27;,
+    unsafe_allow_html=True,
 )
 
-st.markdown(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&lt;hr <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&#x27;styled-divider&#x27;</span>&gt;&quot;</span>, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+st.markdown(&quot;&lt;hr class=&#x27;styled-divider&#x27;&gt;&quot;, unsafe_allow_html=True)
 
 
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#525252; font-style:italic;"># SIDEBAR — SETTINGS</span>
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#67e8f9;">with</span> st.sidebar:
-    st.markdown(&<span style="color:#525252; font-style:italic;">#x27;&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&quot;section-label&quot;</span>&gt;Connection&lt;/div&gt;&#x27;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
-    server_hostname = st.text_input(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Server hostname (no https://)&quot;</span>, value=DEFAULT_SERVER_HOSTNAME)</span>
-    http_path       = st.text_input(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;HTTP path&quot;</span>, value=DEFAULT_HTTP_PATH)</span>
+# ============================================================
+# SIDEBAR — SETTINGS
+# ============================================================
+with st.sidebar:
+    st.markdown(&#x27;&lt;div class=&quot;section-label&quot;&gt;Connection&lt;/div&gt;&#x27;, unsafe_allow_html=True)
+    server_hostname = st.text_input(&quot;Server hostname (no https://)&quot;, value=DEFAULT_SERVER_HOSTNAME)
+    http_path       = st.text_input(&quot;HTTP path&quot;, value=DEFAULT_HTTP_PATH)
 
-    st.markdown(&<span style="color:#525252; font-style:italic;">#x27;&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&quot;section-label&quot;</span>&gt;Folder Settings&lt;/div&gt;&#x27;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+    st.markdown(&#x27;&lt;div class=&quot;section-label&quot;&gt;Folder Settings&lt;/div&gt;&#x27;, unsafe_allow_html=True)
     source_dir = st.text_input(
-        <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Source folder (Steps 2 &amp; 8)&quot;</span>,</span>
+        &quot;Source folder (Steps 2 &amp; 8)&quot;,
         value=DEFAULT_SOURCE_DIR,
     )
     archive_dir = st.text_input(
-        <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Archive folder (Step 3)&quot;</span>,</span>
+        &quot;Archive folder (Step 3)&quot;,
         value=DEFAULT_ARCHIVE_DIR,
     )
     report_file_path = st.text_input(
-        <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Macro-enabled Excel report&quot;</span>,</span>
+        &quot;Macro-enabled Excel report&quot;,
         value=DEFAULT_REPORT_FILE_PATH,
     )
-    sheet_name   = st.text_input(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Excel sheet name&quot;</span>, value=DEFAULT_SHEET_NAME)</span>
-    preview_rows = st.number_input(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Preview rows&quot;</span>, min_value=10, max_value=500, value=50, step=10)</span>
-    show_query   = st.checkbox(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Show SQL query&quot;</span>, value=<span style="color:#67e8f9;">False</span>)</span>
+    sheet_name   = st.text_input(&quot;Excel sheet name&quot;, value=DEFAULT_SHEET_NAME)
+    preview_rows = st.number_input(&quot;Preview rows&quot;, min_value=10, max_value=500, value=50, step=10)
+    show_query   = st.checkbox(&quot;Show SQL query&quot;, value=False)
 
 
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#525252; font-style:italic;"># PROCESS FLOW OVERVIEW</span>
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-st.markdown(&<span style="color:#525252; font-style:italic;">#x27;&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&quot;section-label&quot;</span>&gt;Process Flow&lt;/div&gt;&#x27;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+# ============================================================
+# PROCESS FLOW OVERVIEW
+# ============================================================
+st.markdown(&#x27;&lt;div class=&quot;section-label&quot;&gt;Process Flow&lt;/div&gt;&#x27;, unsafe_allow_html=True)
 
-st.markdown(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;</span>
-&lt;ul <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;flow-list&quot;</span>&gt;</span>
+st.markdown(&quot;&quot;&quot;
+&lt;ul class=&quot;flow-list&quot;&gt;
   &lt;li&gt;Open Outlook Classic&lt;/li&gt;
-  &lt;li&gt;Archive the existing file <span style="color:#67e8f9;">in</span> the source folder&lt;/li&gt;
-  &lt;li&gt;Run the Databricks query <span style="color:#67e8f9;">and</span> export the new weekly file to Excel&lt;/li&gt;
+  &lt;li&gt;Archive the existing file in the source folder&lt;/li&gt;
+  &lt;li&gt;Run the Databricks query and export the new weekly file to Excel&lt;/li&gt;
   &lt;li&gt;Open the macro-enabled Weekly Lead Recap Report file&lt;/li&gt;
   &lt;li&gt;Continue the Excel workflow (Pivots → Refresh All → Save As → Send Emails)&lt;/li&gt;
 &lt;/ul&gt;
-<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+&quot;&quot;&quot;, unsafe_allow_html=True)
 
-<span style="color:#67e8f9;">if</span> show_query:
-    st.markdown(&<span style="color:#525252; font-style:italic;">#x27;&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&quot;section-label&quot;</span>&gt;SQL Query&lt;/div&gt;&#x27;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
-    st.code(SQL_QUERY, language=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;sql&quot;</span>)</span>
+if show_query:
+    st.markdown(&#x27;&lt;div class=&quot;section-label&quot;&gt;SQL Query&lt;/div&gt;&#x27;, unsafe_allow_html=True)
+    st.code(SQL_QUERY, language=&quot;sql&quot;)
 
-st.markdown(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&lt;hr <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&#x27;styled-divider&#x27;</span>&gt;&quot;</span>, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+st.markdown(&quot;&lt;hr class=&#x27;styled-divider&#x27;&gt;&quot;, unsafe_allow_html=True)
 
 
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#525252; font-style:italic;"># STEP 1 — OPEN OUTLOOK</span>
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-st.markdown(&<span style="color:#525252; font-style:italic;">#x27;&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&quot;section-label&quot;</span>&gt;Step 1&lt;/div&gt;&#x27;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
-st.markdown(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;</span>
-&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-card&quot;</span>&gt;</span>
-  &lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-number&quot;</span>&gt;Step 1 of 5&lt;/div&gt;</span>
-  &lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-title&quot;</span>&gt;Open Outlook Classic&lt;/div&gt;</span>
-  &lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-desc&quot;</span>&gt;Launch Outlook Classic before proceeding. This ensures emails will be ready to send after the export <span style="color:#67e8f9;">is</span> complete.&lt;/div&gt;</span>
+# ============================================================
+# STEP 1 — OPEN OUTLOOK
+# ============================================================
+st.markdown(&#x27;&lt;div class=&quot;section-label&quot;&gt;Step 1&lt;/div&gt;&#x27;, unsafe_allow_html=True)
+st.markdown(&quot;&quot;&quot;
+&lt;div class=&quot;step-card&quot;&gt;
+  &lt;div class=&quot;step-number&quot;&gt;Step 1 of 5&lt;/div&gt;
+  &lt;div class=&quot;step-title&quot;&gt;Open Outlook Classic&lt;/div&gt;
+  &lt;div class=&quot;step-desc&quot;&gt;Launch Outlook Classic before proceeding. This ensures emails will be ready to send after the export is complete.&lt;/div&gt;
 &lt;/div&gt;
-<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+&quot;&quot;&quot;, unsafe_allow_html=True)
 
-open_outlook_btn    = st.button(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Open Outlook Classic&quot;</span>, type=<span style="color:#86efac;">&quot;primary&quot;</span>, key=<span style="color:#86efac;">&quot;open_outlook_button&quot;</span>)</span>
+open_outlook_btn    = st.button(&quot;Open Outlook Classic&quot;, type=&quot;primary&quot;, key=&quot;open_outlook_button&quot;)
 open_outlook_status = st.empty()
 
-<span style="color:#67e8f9;">if</span> open_outlook_btn:
-    <span style="color:#67e8f9;">try</span>:
+if open_outlook_btn:
+    try:
         open_outlook_classic()
-        open_outlook_status.success(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;✓ Outlook Classic opened successfully.&quot;</span>)</span>
-    <span style="color:#67e8f9;">except</span> Exception <span style="color:#67e8f9;">as</span> e:
-        open_outlook_status.error(f<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Failed to open Outlook Classic: {e}&quot;</span>)</span>
+        open_outlook_status.success(&quot;✓ Outlook Classic opened successfully.&quot;)
+    except Exception as e:
+        open_outlook_status.error(f&quot;Failed to open Outlook Classic: {e}&quot;)
 
-st.markdown(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&lt;hr <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&#x27;styled-divider&#x27;</span>&gt;&quot;</span>, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+st.markdown(&quot;&lt;hr class=&#x27;styled-divider&#x27;&gt;&quot;, unsafe_allow_html=True)
 
 
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#525252; font-style:italic;"># STEP 2 — ARCHIVE</span>
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-st.markdown(&<span style="color:#525252; font-style:italic;">#x27;&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&quot;section-label&quot;</span>&gt;Step 2&lt;/div&gt;&#x27;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
-st.markdown(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;</span>
-&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-card&quot;</span>&gt;</span>
-  &lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-number&quot;</span>&gt;Step 2 of 5&lt;/div&gt;</span>
-  &lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-title&quot;</span>&gt;Archive Existing Source File&lt;/div&gt;</span>
-  &lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-desc&quot;</span>&gt;Moves any existing files <span style="color:#67e8f9;">from</span> the source folder to the archive folder before creating the new weekly export. Complete this before running Step 3.&lt;/div&gt;</span>
+# ============================================================
+# STEP 2 — ARCHIVE
+# ============================================================
+st.markdown(&#x27;&lt;div class=&quot;section-label&quot;&gt;Step 2&lt;/div&gt;&#x27;, unsafe_allow_html=True)
+st.markdown(&quot;&quot;&quot;
+&lt;div class=&quot;step-card&quot;&gt;
+  &lt;div class=&quot;step-number&quot;&gt;Step 2 of 5&lt;/div&gt;
+  &lt;div class=&quot;step-title&quot;&gt;Archive Existing Source File&lt;/div&gt;
+  &lt;div class=&quot;step-desc&quot;&gt;Moves any existing files from the source folder to the archive folder before creating the new weekly export. Complete this before running Step 3.&lt;/div&gt;
 &lt;/div&gt;
-<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+&quot;&quot;&quot;, unsafe_allow_html=True)
 
-archive_btn      = st.button(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Archive Existing Source File&quot;</span>, type=<span style="color:#86efac;">&quot;primary&quot;</span>, key=<span style="color:#86efac;">&quot;archive_button&quot;</span>)</span>
+archive_btn      = st.button(&quot;Archive Existing Source File&quot;, type=&quot;primary&quot;, key=&quot;archive_button&quot;)
 archive_status   = st.empty()
 archive_progress = st.progress(0)
 
-<span style="color:#67e8f9;">if</span> archive_btn:
-    <span style="color:#67e8f9;">try</span>:
+if archive_btn:
+    try:
         archive_progress.progress(10)
-        archive_status.info(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Checking source folder <span style="color:#67e8f9;">and</span> archiving existing file(s)…&quot;</span>)</span>
+        archive_status.info(&quot;Checking source folder and archiving existing file(s)…&quot;)
 
         moved_files = archive_existing_source_files(
             source_dir=source_dir.strip(),
@@ -1027,58 +1028,58 @@ archive_progress = st.progress(0)
         )
 
         archive_progress.progress(100)
-        st.session_state.archive_done   = <span style="color:#67e8f9;">True</span>
+        st.session_state.archive_done   = True
         st.session_state.archive_result = moved_files
-        st.session_state.export_result  = <span style="color:#67e8f9;">None</span>
+        st.session_state.export_result  = None
 
-        <span style="color:#67e8f9;">if</span> moved_files:
-            archive_status.success(f<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;✓ Archived {len(moved_files):,} file(s). You can now proceed to Step 3.&quot;</span>)</span>
-        <span style="color:#67e8f9;">else</span>:
-            archive_status.warning(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;No existing file found <span style="color:#67e8f9;">in</span> the source folder. You can still proceed to Step 3.&quot;</span>)</span>
-    <span style="color:#67e8f9;">except</span> Exception <span style="color:#67e8f9;">as</span> e:
+        if moved_files:
+            archive_status.success(f&quot;✓ Archived {len(moved_files):,} file(s). You can now proceed to Step 3.&quot;)
+        else:
+            archive_status.warning(&quot;No existing file found in the source folder. You can still proceed to Step 3.&quot;)
+    except Exception as e:
         archive_progress.progress(0)
-        st.session_state.archive_done = <span style="color:#67e8f9;">False</span>
-        archive_status.error(f<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Archive failed: {e}&quot;</span>)</span>
+        st.session_state.archive_done = False
+        archive_status.error(f&quot;Archive failed: {e}&quot;)
 
-<span style="color:#67e8f9;">if</span> st.session_state.archive_result <span style="color:#67e8f9;">is</span> <span style="color:#67e8f9;">not</span> <span style="color:#67e8f9;">None</span> <span style="color:#67e8f9;">and</span> len(st.session_state.archive_result) &gt; 0:
-    st.markdown(&<span style="color:#525252; font-style:italic;">#x27;&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&quot;section-label&quot;</span>&gt;Archived Files&lt;/div&gt;&#x27;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
-    st.dataframe(pd.DataFrame(st.session_state.archive_result), use_container_width=<span style="color:#67e8f9;">True</span>)
+if st.session_state.archive_result is not None and len(st.session_state.archive_result) &gt; 0:
+    st.markdown(&#x27;&lt;div class=&quot;section-label&quot;&gt;Archived Files&lt;/div&gt;&#x27;, unsafe_allow_html=True)
+    st.dataframe(pd.DataFrame(st.session_state.archive_result), use_container_width=True)
 
-st.markdown(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&lt;hr <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&#x27;styled-divider&#x27;</span>&gt;&quot;</span>, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+st.markdown(&quot;&lt;hr class=&#x27;styled-divider&#x27;&gt;&quot;, unsafe_allow_html=True)
 
 
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#525252; font-style:italic;"># STEP 3 — RUN QUERY + EXPORT</span>
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-st.markdown(&<span style="color:#525252; font-style:italic;">#x27;&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&quot;section-label&quot;</span>&gt;Step 3&lt;/div&gt;&#x27;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+# ============================================================
+# STEP 3 — RUN QUERY + EXPORT
+# ============================================================
+st.markdown(&#x27;&lt;div class=&quot;section-label&quot;&gt;Step 3&lt;/div&gt;&#x27;, unsafe_allow_html=True)
 
-_step3_locked = <span style="color:#67e8f9;">not</span> st.session_state.archive_done
+_step3_locked = not st.session_state.archive_done
 
-st.markdown(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;</span>
-&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-card&quot;</span>&gt;</span>
-  &lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-number&quot;</span>&gt;Step 3 of 5&lt;/div&gt;</span>
-  &lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-title&quot;</span>&gt;Run Query + Export Excel&lt;/div&gt;</span>
-  &lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-desc&quot;</span>&gt;Connects to Databricks via OAuth, runs the weekly leads query, <span style="color:#67e8f9;">and</span> exports the result to the source folder <span style="color:#67e8f9;">as</span> a dated Excel file.&lt;/div&gt;</span>
+st.markdown(&quot;&quot;&quot;
+&lt;div class=&quot;step-card&quot;&gt;
+  &lt;div class=&quot;step-number&quot;&gt;Step 3 of 5&lt;/div&gt;
+  &lt;div class=&quot;step-title&quot;&gt;Run Query + Export Excel&lt;/div&gt;
+  &lt;div class=&quot;step-desc&quot;&gt;Connects to Databricks via OAuth, runs the weekly leads query, and exports the result to the source folder as a dated Excel file.&lt;/div&gt;
 &lt;/div&gt;
-<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+&quot;&quot;&quot;, unsafe_allow_html=True)
 
-<span style="color:#67e8f9;">if</span> st.session_state.archive_done:
-    st.success(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;✓ Step 2 completed — ready to run the export.&quot;</span>)</span>
-<span style="color:#67e8f9;">else</span>:
-    st.warning(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Complete Step 2 first before running the export.&quot;</span>)</span>
+if st.session_state.archive_done:
+    st.success(&quot;✓ Step 2 completed — ready to run the export.&quot;)
+else:
+    st.warning(&quot;Complete Step 2 first before running the export.&quot;)
 
-run_btn      = st.button(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Run Query + Export Excel&quot;</span>, type=<span style="color:#86efac;">&quot;primary&quot;</span>, disabled=_step3_locked, key=<span style="color:#86efac;">&quot;run_export_button&quot;</span>)</span>
+run_btn      = st.button(&quot;Run Query + Export Excel&quot;, type=&quot;primary&quot;, disabled=_step3_locked, key=&quot;run_export_button&quot;)
 run_status   = st.empty()
 run_progress = st.progress(0)
 
-<span style="color:#67e8f9;">if</span> run_btn:
-    <span style="color:#67e8f9;">if</span> <span style="color:#67e8f9;">not</span> server_hostname.strip() <span style="color:#67e8f9;">or</span> <span style="color:#67e8f9;">not</span> http_path.strip():
-        st.error(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Please fill <span style="color:#67e8f9;">in</span> Server hostname <span style="color:#67e8f9;">and</span> HTTP path <span style="color:#67e8f9;">in</span> the sidebar.&quot;</span>)</span>
+if run_btn:
+    if not server_hostname.strip() or not http_path.strip():
+        st.error(&quot;Please fill in Server hostname and HTTP path in the sidebar.&quot;)
         st.stop()
 
-    <span style="color:#67e8f9;">try</span>:
+    try:
         run_progress.progress(10)
-        run_status.info(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Connecting to Databricks (OAuth) <span style="color:#67e8f9;">and</span> running query…&quot;</span>)</span>
+        run_status.info(&quot;Connecting to Databricks (OAuth) and running query…&quot;)
 
         df = run_databricks_query_oauth(
             server_hostname=server_hostname.strip(),
@@ -1087,7 +1088,7 @@ run_progress = st.progress(0)
         )
 
         run_progress.progress(60)
-        run_status.info(f<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Query returned {len(df):,} rows. Exporting to Excel…&quot;</span>)</span>
+        run_status.info(f&quot;Query returned {len(df):,} rows. Exporting to Excel…&quot;)
 
         out_path = export_to_excel(
             df=df,
@@ -1096,88 +1097,88 @@ run_progress = st.progress(0)
         )
 
         run_progress.progress(100)
-        run_status.success(f<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;✓ Excel saved to: {out_path}&quot;</span>)</span>
+        run_status.success(f&quot;✓ Excel saved to: {out_path}&quot;)
 
         st.session_state.export_result = {
-            <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;out_path&quot;</span>:   out_path,</span>
-            <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;preview_df&quot;</span>: df.head(int(preview_rows)).copy(),</span>
-            <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;full_df&quot;</span>:    df.copy(),</span>
+            &quot;out_path&quot;:   out_path,
+            &quot;preview_df&quot;: df.head(int(preview_rows)).copy(),
+            &quot;full_df&quot;:    df.copy(),
         }
 
-    <span style="color:#67e8f9;">except</span> Exception <span style="color:#67e8f9;">as</span> e:
+    except Exception as e:
         run_progress.progress(0)
-        run_status.error(f<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Export failed: {e}&quot;</span>)</span>
-        <span style="color:#67e8f9;">with</span> st.expander(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Common fixes&quot;</span>, expanded=<span style="color:#67e8f9;">True</span>):</span>
+        run_status.error(f&quot;Export failed: {e}&quot;)
+        with st.expander(&quot;Common fixes&quot;, expanded=True):
             st.markdown(
-                <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;- Make sure your Databricks SQL Warehouse <span style="color:#67e8f9;">is</span> **Running**.\n&quot;</span></span>
-                <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;- Confirm you have permission to query `boberdoo.bronze.gpst_30`.\n&quot;</span></span>
-                <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;- If the OAuth browser window does <span style="color:#67e8f9;">not</span> open, allow popups <span style="color:#67e8f9;">or</span> <span style="color:#67e8f9;">try</span> another browser.\n&quot;</span></span>
-                <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;- Upgrade connector: `pip install --upgrade databricks-sql-connector`.\n&quot;</span></span>
-                <span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;- If you get an OAuth/redirect error, copy the exact error text <span style="color:#67e8f9;">and</span> contact support.&quot;</span></span>
+                &quot;- Make sure your Databricks SQL Warehouse is **Running**.\n&quot;
+                &quot;- Confirm you have permission to query `boberdoo.bronze.gpst_30`.\n&quot;
+                &quot;- If the OAuth browser window does not open, allow popups or try another browser.\n&quot;
+                &quot;- Upgrade connector: `pip install --upgrade databricks-sql-connector`.\n&quot;
+                &quot;- If you get an OAuth/redirect error, copy the exact error text and contact support.&quot;
             )
 
-<span style="color:#67e8f9;">if</span> st.session_state.export_result <span style="color:#67e8f9;">is</span> <span style="color:#67e8f9;">not</span> <span style="color:#67e8f9;">None</span>:
-    st.markdown(&<span style="color:#525252; font-style:italic;">#x27;&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&quot;section-label&quot;</span>&gt;Preview&lt;/div&gt;&#x27;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
-    st.dataframe(st.session_state.export_result[<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;preview_df&quot;</span>], use_container_width=<span style="color:#67e8f9;">True</span>)</span>
+if st.session_state.export_result is not None:
+    st.markdown(&#x27;&lt;div class=&quot;section-label&quot;&gt;Preview&lt;/div&gt;&#x27;, unsafe_allow_html=True)
+    st.dataframe(st.session_state.export_result[&quot;preview_df&quot;], use_container_width=True)
 
-    st.markdown(&<span style="color:#525252; font-style:italic;">#x27;&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&quot;section-label&quot;</span>&gt;Download&lt;/div&gt;&#x27;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
-    <span style="color:#67e8f9;">with</span> open(st.session_state.export_result[<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;out_path&quot;</span>], <span style="color:#86efac;">&quot;rb&quot;</span>) <span style="color:#67e8f9;">as</span> f:</span>
+    st.markdown(&#x27;&lt;div class=&quot;section-label&quot;&gt;Download&lt;/div&gt;&#x27;, unsafe_allow_html=True)
+    with open(st.session_state.export_result[&quot;out_path&quot;], &quot;rb&quot;) as f:
         st.download_button(
-            label=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;⬇ Download Excel file&quot;</span>,</span>
+            label=&quot;⬇ Download Excel file&quot;,
             data=f,
-            file_name=os.path.basename(st.session_state.export_result[<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;out_path&quot;</span>]),</span>
-            mime=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&quot;</span>,</span>
+            file_name=os.path.basename(st.session_state.export_result[&quot;out_path&quot;]),
+            mime=&quot;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet&quot;,
         )
 
-st.markdown(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&lt;hr <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&#x27;styled-divider&#x27;</span>&gt;&quot;</span>, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+st.markdown(&quot;&lt;hr class=&#x27;styled-divider&#x27;&gt;&quot;, unsafe_allow_html=True)
 
 
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#525252; font-style:italic;"># STEP 4 — OPEN MACRO FILE</span>
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-st.markdown(&<span style="color:#525252; font-style:italic;">#x27;&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&quot;section-label&quot;</span>&gt;Step 4&lt;/div&gt;&#x27;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
-st.markdown(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;</span>
-&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-card&quot;</span>&gt;</span>
-  &lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-number&quot;</span>&gt;Step 4 of 5&lt;/div&gt;</span>
-  &lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-title&quot;</span>&gt;Open Weekly Lead Recap Report&lt;/div&gt;</span>
-  &lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-desc&quot;</span>&gt;Opens the macro-enabled Excel file. Use this after the export <span style="color:#67e8f9;">from</span> Step 3 <span style="color:#67e8f9;">is</span> complete.&lt;/div&gt;</span>
+# ============================================================
+# STEP 4 — OPEN MACRO FILE
+# ============================================================
+st.markdown(&#x27;&lt;div class=&quot;section-label&quot;&gt;Step 4&lt;/div&gt;&#x27;, unsafe_allow_html=True)
+st.markdown(&quot;&quot;&quot;
+&lt;div class=&quot;step-card&quot;&gt;
+  &lt;div class=&quot;step-number&quot;&gt;Step 4 of 5&lt;/div&gt;
+  &lt;div class=&quot;step-title&quot;&gt;Open Weekly Lead Recap Report&lt;/div&gt;
+  &lt;div class=&quot;step-desc&quot;&gt;Opens the macro-enabled Excel file. Use this after the export from Step 3 is complete.&lt;/div&gt;
 &lt;/div&gt;
-<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+&quot;&quot;&quot;, unsafe_allow_html=True)
 
-open_report_btn    = st.button(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Open Weekly Lead Recap Report.xlsm&quot;</span>, type=<span style="color:#86efac;">&quot;primary&quot;</span>, key=<span style="color:#86efac;">&quot;open_report_button&quot;</span>)</span>
+open_report_btn    = st.button(&quot;Open Weekly Lead Recap Report.xlsm&quot;, type=&quot;primary&quot;, key=&quot;open_report_button&quot;)
 open_report_status = st.empty()
 
-<span style="color:#67e8f9;">if</span> open_report_btn:
-    <span style="color:#67e8f9;">try</span>:
+if open_report_btn:
+    try:
         open_file_in_default_app(report_file_path.strip())
-        open_report_status.success(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;✓ Weekly Lead Recap Report opened successfully.&quot;</span>)</span>
-    <span style="color:#67e8f9;">except</span> Exception <span style="color:#67e8f9;">as</span> e:
-        open_report_status.error(f<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;Failed to open report file: {e}&quot;</span>)</span>
+        open_report_status.success(&quot;✓ Weekly Lead Recap Report opened successfully.&quot;)
+    except Exception as e:
+        open_report_status.error(f&quot;Failed to open report file: {e}&quot;)
 
-st.markdown(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&lt;hr <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&#x27;styled-divider&#x27;</span>&gt;&quot;</span>, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+st.markdown(&quot;&lt;hr class=&#x27;styled-divider&#x27;&gt;&quot;, unsafe_allow_html=True)
 
 
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-<span style="color:#525252; font-style:italic;"># STEP 5 — MANUAL EXCEL WORKFLOW</span>
-<span style="color:#525252; font-style:italic;"># ============================================================</span>
-st.markdown(&<span style="color:#525252; font-style:italic;">#x27;&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:#86efac;">&quot;section-label&quot;</span>&gt;Step 5&lt;/div&gt;&#x27;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
-st.markdown(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;</span>
-&lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-card&quot;</span>&gt;</span>
-  &lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-number&quot;</span>&gt;Step 5 of 5&lt;/div&gt;</span>
-  &lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-title&quot;</span>&gt;Continue Your Excel Workflow&lt;/div&gt;</span>
-  &lt;div <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;step-desc&quot;</span>&gt;After opening the report file, complete the following steps inside Excel.&lt;/div&gt;</span>
+# ============================================================
+# STEP 5 — MANUAL EXCEL WORKFLOW
+# ============================================================
+st.markdown(&#x27;&lt;div class=&quot;section-label&quot;&gt;Step 5&lt;/div&gt;&#x27;, unsafe_allow_html=True)
+st.markdown(&quot;&quot;&quot;
+&lt;div class=&quot;step-card&quot;&gt;
+  &lt;div class=&quot;step-number&quot;&gt;Step 5 of 5&lt;/div&gt;
+  &lt;div class=&quot;step-title&quot;&gt;Continue Your Excel Workflow&lt;/div&gt;
+  &lt;div class=&quot;step-desc&quot;&gt;After opening the report file, complete the following steps inside Excel.&lt;/div&gt;
 &lt;/div&gt;
-<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+&quot;&quot;&quot;, unsafe_allow_html=True)
 
-st.markdown(<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;</span>
-&lt;ul <span style="color:#67e8f9;">class</span>=<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;flow-list&quot;</span>&gt;</span>
+st.markdown(&quot;&quot;&quot;
+&lt;ul class=&quot;flow-list&quot;&gt;
   &lt;li&gt;Go to the &lt;strong&gt;Pivots&lt;/strong&gt; sheet&lt;/li&gt;
   &lt;li&gt;Click &lt;strong&gt;Refresh All&lt;/strong&gt;&lt;/li&gt;
   &lt;li&gt;Click the 4 &lt;strong&gt;Save As&lt;/strong&gt; buttons&lt;/li&gt;
   &lt;li&gt;Click the 4 &lt;strong&gt;Send Email&lt;/strong&gt; buttons&lt;/li&gt;
-  &lt;li&gt;Review the drafted emails <span style="color:#67e8f9;">and</span> send them&lt;/li&gt;
+  &lt;li&gt;Review the drafted emails and send them&lt;/li&gt;
 &lt;/ul&gt;
-<span style="color:<span style="color:#525252; font-style:italic;">#86efac;">&quot;&quot;</span>&quot;, unsafe_allow_html=<span style="color:#67e8f9;">True</span>)</span>
+&quot;&quot;&quot;, unsafe_allow_html=True)
 </pre>
     </div>
   </section>
